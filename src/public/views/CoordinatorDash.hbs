@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinator Dashboard</title>
+    <link rel="stylesheet" href="/css/CoordinatorDash.css">
+    <style>
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Coordinator Dashboard</h1>
+        <input type="text" id="searchDepartment" placeholder="Search by Department">
+        <input type="text" id="searchYear" placeholder="Search by Year">
+        <button onclick="searchTable()">Search</button>
+        <table id="table1">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Year</th>
+                    <th>Question Paper</th>
+                    <th>Submission Status</th>
+                    <th>Check Submission</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each hodAssigns}}
+                    <tr>
+                        <td>{{this.teacherName}}</td>
+                        <td>{{this.teacherEmail}}</td>
+                        <td>{{this.teacherDepartment}}</td>
+                        <td>{{this.semester}}</td>
+                        <td>{{this.year}}</td>
+                        <td>
+                            <form action="/downloadQuestionPaper" method="GET">
+                               <input type="hidden" name="teacherEmail" value="{{this.teacherEmail}}">
+                               <button type="submit">Download</button>
+                            </form>
+                        </td>
+                        <td>{{this.submissionStatus}}</td>
+                        <td>
+                            <form action="/checkSubmission" method="POST">
+                                <input type="hidden" name="teacherEmail" value="{{this.teacherEmail}}">
+                                <input type="checkbox" name="isChecked" {{#if this.coordinatorAction}} checked {{/if}}>
+                                <button type="submit">Submit</button>
+                            </form>
+                            <span>{{#if this.coordinatorAction}}Question Paper Received{{/if}}</span>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <button type="button"><a href="/home">Back to Home</a></button>
+    </div>
+
+    <script>
+        function searchTable() {
+            const searchDepartment = document.getElementById('searchDepartment').value.toLowerCase();
+            const searchYear = document.getElementById('searchYear').value.toLowerCase();
+
+            const table = document.getElementById('table1');
+            const rows = table.getElementsByTagName('tr');
+            for (let i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+                const cells = rows[i].getElementsByTagName('td');
+                const departmentCell = cells[2].textContent.toLowerCase();
+                const yearCell = cells[4].textContent.toLowerCase();
+
+                if (departmentCell.includes(searchDepartment) && yearCell.includes(searchYear)) {
+                    rows[i].classList.add('highlight');
+                } else {
+                    rows[i].classList.remove('highlight');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
